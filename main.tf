@@ -24,7 +24,6 @@ resource "aws_subnet" "public-subnets" {
   }
 }
 
-
 # Route table : public
 resource "aws_route_table" "public-route-table" {
   vpc_id = aws_vpc.london-vpc.id
@@ -36,6 +35,7 @@ resource "aws_route_table" "public-route-table" {
     Name = "public-route-table"
   }
 }
+
 # Route table associations : public
 resource "aws_route_table_association" "public-route-table-association" {
   count           = length(var.public_cidr)
