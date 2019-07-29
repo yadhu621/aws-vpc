@@ -15,7 +15,7 @@ resource "aws_internet_gateway" "london-igw" {
 }
 
 ## Subnets : public
-resource "aws_subnet" "public" {
+resource "aws_subnet" "public-subnets" {
   count       = length(var.public_cidr)
   vpc_id      = aws_vpc.london-vpc.id
   cidr_block  = element(var.public_cidr, count.index)
@@ -25,42 +25,22 @@ resource "aws_subnet" "public" {
 }
 
 
-# resource "aws_subnet" "public-subnet-1" {
-#   vpc_id = aws_vpc.london-vpc.id
-#   cidr_block = "10.0.16.0/26" # total hosts = 64
-#   tags = {
-#     Name = "public-subnet-1"
-#   }
-# }
+# Route table : public
+resource "aws_route_table" "public-route-table" {
+  vpc_id = aws_vpc.london-vpc.id
 
-# resource "aws_subnet" "public-subnet-2" {
-#   vpc_id = aws_vpc.london-vpc.id
-#   cidr_block = "10.0.16.64/26" # total hosts = 64
-#   tags = {
-#     Name = "public-subnet-1"
-#   }
-# }
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.london-igw.id
+  }
 
-# resource "aws_subnet" "public-subnet-3" {
-#   vpc_id = aws_vpc.london-vpc.id
-#   cidr_block = "10.0.16.128/26" # total hosts = 64
-#   tags = {
-#     Name = "public-subnet-1"
-#   }
-# }
-
-
-# # create route table for public
-# resource "aws_route_table" "public-route-table" {
-#   vpc_id = aws_vpc.london-vpc.id
-
-#   route {
-#     cidr_block = "0.0.0.0/0"
-#     gateway_id = aws_internet_gateway.london-igw.id
-#   }
-
-#   tags = {
-#     Name = "public-route-table"
-#   }
-# }
+  tags = {
+    Name = "public-route-table"
+  }
+}
 # attach route table to public subnets
+resource "aws_route_table_association" "public-route-table-association" {
+  count = length(var.public_cidr)
+  subnet_id = element(aws_subnet.public-subnets.*.id,count.index)
+  route_table_id = aws_route_table.public-route-table.id
+}
