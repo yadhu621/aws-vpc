@@ -1,3 +1,3 @@
 output "vpc_id" {
-  value = aws_vpc.london-tf-vpc.id
+  value = aws_vpc.london-vpc.id
 }
