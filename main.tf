@@ -28,19 +28,17 @@ resource "aws_subnet" "public-subnets" {
 # Route table : public
 resource "aws_route_table" "public-route-table" {
   vpc_id = aws_vpc.london-vpc.id
-
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.london-igw.id
   }
-
   tags = {
     Name = "public-route-table"
   }
 }
-# attach route table to public subnets
+# Route table associations : public
 resource "aws_route_table_association" "public-route-table-association" {
-  count = length(var.public_cidr)
-  subnet_id = element(aws_subnet.public-subnets.*.id,count.index)
-  route_table_id = aws_route_table.public-route-table.id
+  count           = length(var.public_cidr)
+  subnet_id       = element(aws_subnet.public-subnets.*.id,count.index)
+  route_table_id  = aws_route_table.public-route-table.id
 }
